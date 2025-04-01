@@ -1,5 +1,3 @@
-@file:Suppress("FunctionNaming")
-
 package it.unibo.collektive
 
 import android.os.Bundle
