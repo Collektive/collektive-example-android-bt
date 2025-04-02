@@ -29,6 +29,8 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+ble = { module = "no.nordicsemi.android:ble", version = "2.10.0" }
+ble-ktx = { module = "no.nordicsemi.android:ble-ktx", version = "2.10.0" }
 collektive = { module = "it.unibo.collektive:dsl", version.ref = "collektive" }
 collektive-stdlib = { module = "it.unibo.collektive:stdlib", version.ref = "collektive" }
 collektive-plugin = { module = "it.unibo.collektive:compiler-plugin", version.ref = "collektive" }
@@ -38,6 +40,7 @@ kotlin-logging-android = { module = "io.github.oshai:kotlin-logging-android", ve
 kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.2"
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
+mesh = { module = "no.nordicsemi.android:mesh", version = "3.3.4" }
 mktt = { module = "it.nicolasfarabegoli:mktt", version = "1.2.3" }
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 
