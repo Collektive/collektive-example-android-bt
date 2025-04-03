@@ -1,10 +1,14 @@
 package it.unibo.collektive.network.bluetooth
 
 import android.Manifest
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
+import android.bluetooth.le.AdvertisingSet
+import android.bluetooth.le.AdvertisingSetCallback
+import android.bluetooth.le.AdvertisingSetParameters
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
@@ -39,6 +43,7 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
             super.onScanResult(callbackType, result)
             result?.scanRecord?.let { scanRecord ->
                 scanRecord.serviceUuids.forEach { parcelUuid ->
+                    Log.d(TAG, "Found: $parcelUuid")
                     if (parcelUuid.uuid == SERVICE_UUID) {
                         val serviceData = scanRecord.getServiceData(ParcelUuid(SERVICE_UUID))
                         serviceData?.decodeToString()?.let { neighborDeviceId ->
@@ -61,7 +66,7 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
     fun startAdvertisingDeviceId() {
         if (!isAdvertising) {
-            advertiser.startAdvertising(ADVERTISE_SETTINGS, advertiseIdData, ADVERTISE_CALLBACK)
+            advertiser.startAdvertisingSet(ADVERTISE_PARAMETERS, advertiseIdData, null, null, null, ADVERTISE_CALLBACK)
             bleScanner.startScan(SCAN_FILTER, SCAN_SETTINGS, scanCallback)
             isAdvertising = true
             Log.i(TAG, "Start advertising and scanning")
@@ -71,7 +76,7 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
     fun stopAdvertisingDeviceId() {
         if (isAdvertising) {
-            advertiser.stopAdvertising(ADVERTISE_CALLBACK)
+            advertiser.stopAdvertisingSet(ADVERTISE_CALLBACK)
             bleScanner.stopScan(scanCallback)
             isAdvertising = false
             Log.i(TAG, "Stop advertising and scanning")
@@ -83,21 +88,22 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
     private companion object {
         private const val TAG: String = "BluetoothIdAdvertiser"
         private val SERVICE_UUID = UUID.fromString("0000AAAA-0000-1000-8000-00805F9B34FB")
-        private val ADVERTISE_SETTINGS = AdvertiseSettings.Builder().apply {
-            setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
-            setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-            setConnectable(false)
+        private val ADVERTISE_PARAMETERS = AdvertisingSetParameters.Builder().apply {
+            setLegacyMode(false)
+            setInterval(AdvertisingSetParameters.INTERVAL_HIGH)
+            setTxPowerLevel(AdvertisingSetParameters.TX_POWER_MEDIUM)
+            setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+            setSecondaryPhy(BluetoothDevice.PHY_LE_2M)
         }.build()
-        private val ADVERTISE_CALLBACK = object : AdvertiseCallback() {
-            override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-                super.onStartSuccess(settingsInEffect)
-                Log.i(TAG, "Advertising start successfully")
-                Log.d(TAG, "Advertising settings in use: $settingsInEffect")
+        private val ADVERTISE_CALLBACK = object : AdvertisingSetCallback() {
+            override fun onAdvertisingSetStarted(advertisingSet: AdvertisingSet?, txPower: Int, status: Int) {
+                super.onAdvertisingSetStarted(advertisingSet, txPower, status)
+                Log.i(TAG, "Start advertising with tx power: $txPower")
             }
 
-            override fun onStartFailure(errorCode: Int) {
-                super.onStartFailure(errorCode)
-                Log.e(TAG, "Advertising failed with error: $errorCode")
+            override fun onAdvertisingSetStopped(advertisingSet: AdvertisingSet?) {
+                super.onAdvertisingSetStopped(advertisingSet)
+                Log.i(TAG, "Stop advertising")
             }
         }
         private val SCAN_FILTER = listOf(ScanFilter.Builder().setServiceUuid(ParcelUuid(SERVICE_UUID)).build())
