@@ -13,8 +13,12 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 import kotlin.uuid.Uuid
@@ -38,7 +42,7 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
                     if (parcelUuid.uuid == SERVICE_UUID) {
                         val serviceData = scanRecord.getServiceData(ParcelUuid(SERVICE_UUID))
                         serviceData?.decodeToString()?.let { neighborDeviceId ->
-                            _neighborsIds.value += Uuid.parse(neighborDeviceId)
+                            _neighborsIds.tryEmit(Uuid.parse(neighborDeviceId))
                             Log.i(TAG, "Discovered neighbor device with ID: $neighborDeviceId")
                         }
                     }
@@ -51,7 +55,7 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
             Log.e(TAG, "Scan failed with error: $errorCode")
         }
     }
-    private val _neighborsIds = MutableStateFlow(emptySet<Uuid>())
+    private val _neighborsIds = MutableSharedFlow<Uuid>(replay = 1)
     private var isAdvertising = false
 
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
@@ -74,7 +78,7 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
         }
     }
 
-    fun neighborsIds(): StateFlow<Set<Uuid>> = _neighborsIds.asStateFlow()
+    fun neighborsIds(): SharedFlow<Uuid> = _neighborsIds.asSharedFlow()
 
     private companion object {
         private const val TAG: String = "BluetoothIdAdvertiser"

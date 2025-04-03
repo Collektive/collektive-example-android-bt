@@ -1,7 +1,8 @@
 package it.unibo.collektive.viewmodels
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.collektive.Collektive
 import it.unibo.collektive.aggregate.api.Aggregate.Companion.neighboring
@@ -19,7 +20,8 @@ import kotlin.uuid.Uuid
 /**
  * A ViewModel that manages the list of nearby devices.
  */
-class NearbyDevicesViewModel(private val dispatcher: CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
+class NearbyDevicesViewModel(application: Application) : AndroidViewModel(application) {
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
     private val _dataFlow = MutableStateFlow<Set<Uuid>>(emptySet())
     private val _connectionFlow = MutableStateFlow(ConnectionState.DISCONNECTED)
 
@@ -54,7 +56,7 @@ class NearbyDevicesViewModel(private val dispatcher: CoroutineDispatcher = Dispa
     val deviceId = Uuid.random()
 
     private suspend fun collektiveProgram(): Collektive<Uuid, Set<Uuid>> =
-        Collektive(deviceId, MqttMailbox(deviceId, host = "broker.hivemq.com", dispatcher = dispatcher)) {
+        Collektive(deviceId, MqttMailbox(deviceId, host = "broker.hivemq.com", dispatcher = dispatcher, context = getApplication())) {
             neighboring(localId).neighbors.toSet()
         }
 

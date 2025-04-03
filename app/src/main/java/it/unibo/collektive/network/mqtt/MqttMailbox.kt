@@ -1,9 +1,11 @@
 package it.unibo.collektive.network.mqtt
 
+import android.content.Context
 import android.util.Log
 import it.nicolasfarabegoli.mktt.MkttClient
 import it.nicolasfarabegoli.mktt.MqttQoS
 import it.unibo.collektive.network.AbstractSerializerMailbox
+import it.unibo.collektive.network.bluetooth.BluetoothNeighborsDiscoverer
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.SerializedMessage
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,8 +31,10 @@ class MqttMailbox private constructor(
     private val serializer: SerialFormat,
     private val retentionTime: Duration,
     private val dispatcher: CoroutineDispatcher,
+    context: Context,
 ) : AbstractSerializerMailbox<Uuid>(deviceId, serializer, retentionTime) {
     private val internalScope = CoroutineScope(dispatcher)
+    private val neighborsDiscoverer = BluetoothNeighborsDiscoverer(deviceId.toString(), context)
     private val mqttClient = MkttClient(dispatcher) {
         brokerUrl = host
         this.port = port
@@ -40,24 +44,14 @@ class MqttMailbox private constructor(
         Log.i("MqttMailbox", "Connecting to the broker...")
         mqttClient.connect()
         Log.i("MqttMailbox", "Connected to the broker")
-        internalScope.launch(dispatcher) { receiveHeartbeatPulse() }
-        internalScope.launch(dispatcher) { sendHeartbeatPulse() }
+        neighborsDiscoverer.startAdvertisingDeviceId()
+        internalScope.launch {
+            neighborsDiscoverer.neighborsIds().collect {
+                addNeighbor(it)
+            }
+        }
         internalScope.launch { cleanHeartbeatPulse() }
         internalScope.launch(dispatcher) { receiveNeighborMessages() }
-    }
-
-    private suspend fun sendHeartbeatPulse() {
-        mqttClient.publish(heartbeatTopic(deviceId), byteArrayOf())
-        delay(1.seconds)
-        sendHeartbeatPulse()
-    }
-
-    private suspend fun receiveHeartbeatPulse() {
-        mqttClient.subscribe(HEARTBEAT_WILD_CARD).collect {
-            val neighborDeviceId = Uuid.parse(it.topic.split("/").last())
-            Log.i("MqttMailbox", "Received heartbeat pulse from $neighborDeviceId")
-            addNeighbor(neighborDeviceId)
-        }
     }
 
     private suspend fun cleanHeartbeatPulse() {
@@ -111,8 +105,9 @@ class MqttMailbox private constructor(
             serializer: SerialFormat = Json,
             retentionTime: Duration = 5.seconds,
             dispatcher: CoroutineDispatcher,
+            context: Context,
         ): MqttMailbox = coroutineScope {
-            MqttMailbox(deviceId, host, port, serializer, retentionTime, dispatcher).apply {
+            MqttMailbox(deviceId, host, port, serializer, retentionTime, dispatcher, context).apply {
                 initializeMqttClient()
             }
         }

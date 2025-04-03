@@ -1,9 +1,12 @@
 package it.unibo.collektive
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,9 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,6 +56,31 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun BluetoothPermissionHandler(onGrant: () -> Unit) {
+    var permissionGranted by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            permissionGranted = permissions.values.all { it }
+        }
+    )
+    LaunchedEffect(Unit) {
+        val permissions = mutableListOf(
+            android.Manifest.permission.BLUETOOTH_SCAN,
+            android.Manifest.permission.BLUETOOTH_CONNECT,
+            android.Manifest.permission.BLUETOOTH_ADVERTISE,
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(android.Manifest.permission.NEARBY_WIFI_DEVICES)
+        }
+        permissionLauncher.launch(permissions.toTypedArray())
+    }
+    if (permissionGranted) {
+        onGrant()
+    }
+}
+
+@Composable
 private fun CollektiveNearbyDevices(modifier: Modifier = Modifier, viewModel: NearbyDevicesViewModel = viewModel()) {
     val dataFlow by viewModel.dataFlow.collectAsState()
     val connectionFlow by viewModel.connectionFlow.collectAsState()
@@ -56,6 +88,7 @@ private fun CollektiveNearbyDevices(modifier: Modifier = Modifier, viewModel: Ne
         NearbyDevicesViewModel.ConnectionState.CONNECTED -> Color.Green
         NearbyDevicesViewModel.ConnectionState.DISCONNECTED -> Color.Red
     }
+    BluetoothPermissionHandler { }
     LaunchedEffect(Unit) {
         viewModel.startCollektiveProgram()
     }
