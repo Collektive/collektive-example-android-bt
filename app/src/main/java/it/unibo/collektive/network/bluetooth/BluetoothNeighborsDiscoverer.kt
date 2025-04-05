@@ -3,9 +3,7 @@ package it.unibo.collektive.network.bluetooth
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
-import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.AdvertisingSet
 import android.bluetooth.le.AdvertisingSetCallback
 import android.bluetooth.le.AdvertisingSetParameters
@@ -17,17 +15,16 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 import kotlin.uuid.Uuid
 
-class BluetoothNeighborsDiscoverer(private val deviceId: String, private val context: Context) {
+/**
+ * Discovers nearby Bluetooth devices by advertising its [deviceId] and scanning for others.
+ */
+class BluetoothNeighborsDiscoverer(private val deviceId: String, context: Context) {
     private val bleManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val bleAdapter = bleManager.adapter
     private val bleScanner = bleAdapter.bluetoothLeScanner
@@ -60,9 +57,17 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
             Log.e(TAG, "Scan failed with error: $errorCode")
         }
     }
-    private val _neighborsIds = MutableSharedFlow<Uuid>(replay = 1)
     private var isAdvertising = false
+    private val _neighborsIds = MutableSharedFlow<Uuid>(replay = 1)
 
+    /**
+     * Returns a flow of discovered neighbor device IDs.
+     */
+    val neighborsIds: SharedFlow<Uuid> = _neighborsIds.asSharedFlow()
+
+    /**
+     * Starts advertising the device ID and scanning for nearby devices.
+     */
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
     fun startAdvertisingDeviceId() {
         if (!isAdvertising) {
@@ -73,6 +78,9 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
         }
     }
 
+    /**
+     * Stops advertising the device ID and scanning for nearby devices.
+     */
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
     fun stopAdvertisingDeviceId() {
         if (isAdvertising) {
@@ -82,8 +90,6 @@ class BluetoothNeighborsDiscoverer(private val deviceId: String, private val con
             Log.i(TAG, "Stop advertising and scanning")
         }
     }
-
-    fun neighborsIds(): SharedFlow<Uuid> = _neighborsIds.asSharedFlow()
 
     private companion object {
         private const val TAG: String = "BluetoothIdAdvertiser"

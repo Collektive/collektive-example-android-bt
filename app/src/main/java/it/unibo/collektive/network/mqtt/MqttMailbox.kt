@@ -1,7 +1,9 @@
 package it.unibo.collektive.network.mqtt
 
+import android.Manifest
 import android.content.Context
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import it.nicolasfarabegoli.mktt.MkttClient
 import it.nicolasfarabegoli.mktt.MqttQoS
 import it.unibo.collektive.network.AbstractSerializerMailbox
@@ -40,13 +42,14 @@ class MqttMailbox private constructor(
         this.port = port
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
     private suspend fun initializeMqttClient() {
         Log.i("MqttMailbox", "Connecting to the broker...")
         mqttClient.connect()
         Log.i("MqttMailbox", "Connected to the broker")
         neighborsDiscoverer.startAdvertisingDeviceId()
         internalScope.launch {
-            neighborsDiscoverer.neighborsIds().collect {
+            neighborsDiscoverer.neighborsIds.collect {
                 addNeighbor(it)
             }
         }
@@ -98,6 +101,7 @@ class MqttMailbox private constructor(
         /**
          * Create a new instance of [MqttMailbox].
          */
+        @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
         suspend operator fun invoke(
             deviceId: Uuid,
             host: String,
@@ -113,8 +117,6 @@ class MqttMailbox private constructor(
         }
 
         private const val APP_NAMESPACE = "CollektiveExampleAndroid"
-        private const val HEARTBEAT_WILD_CARD = "$APP_NAMESPACE/heartbeat/+"
         private fun deviceTopic(deviceId: Uuid) = "$APP_NAMESPACE/device/$deviceId"
-        private fun heartbeatTopic(deviceId: Uuid) = "$APP_NAMESPACE/heartbeat/$deviceId"
     }
 }

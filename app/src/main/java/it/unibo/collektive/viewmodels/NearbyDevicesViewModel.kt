@@ -1,7 +1,11 @@
 package it.unibo.collektive.viewmodels
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.collektive.Collektive
@@ -21,6 +25,7 @@ import kotlin.uuid.Uuid
  * A ViewModel that manages the list of nearby devices.
  */
 class NearbyDevicesViewModel(application: Application) : AndroidViewModel(application) {
+    @Suppress("InjectDispatcher")
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
     private val _dataFlow = MutableStateFlow<Set<Uuid>>(emptySet())
     private val _connectionFlow = MutableStateFlow(ConnectionState.DISCONNECTED)
@@ -55,10 +60,14 @@ class NearbyDevicesViewModel(application: Application) : AndroidViewModel(applic
      */
     val deviceId = Uuid.random()
 
-    private suspend fun collektiveProgram(): Collektive<Uuid, Set<Uuid>> =
-        Collektive(deviceId, MqttMailbox(deviceId, host = "broker.hivemq.com", dispatcher = dispatcher, context = getApplication())) {
+    @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_SCAN])
+    private suspend fun collektiveProgram(): Collektive<Uuid, Set<Uuid>> {
+        val mailbox =
+            MqttMailbox(deviceId, "broker.hivemq.com", dispatcher = dispatcher, context = getApplication())
+        return Collektive(deviceId, mailbox) {
             neighboring(localId).neighbors.toSet()
         }
+    }
 
     /**
      * Start the Collektive program.
@@ -66,14 +75,27 @@ class NearbyDevicesViewModel(application: Application) : AndroidViewModel(applic
     fun startCollektiveProgram() {
         viewModelScope.launch {
             Log.i("NearbyDevicesViewModel", "Starting Collektive program...")
-            val program = collektiveProgram()
-            _connectionFlow.value = ConnectionState.CONNECTED
-            Log.i("NearbyDevicesViewModel", "Collektive program started")
-            while (true) {
-                val newResult = program.cycle()
-                _dataFlow.value = newResult
-                delay(1.seconds)
-                Log.i("NearbyDevicesViewModel", "New nearby devices: $newResult")
+            val hasScan = ContextCompat.checkSelfPermission(
+                getApplication(),
+                Manifest.permission.BLUETOOTH_SCAN,
+            ) == PackageManager.PERMISSION_GRANTED
+            val hasAdvertise = ContextCompat.checkSelfPermission(
+                getApplication(),
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+            ) == PackageManager.PERMISSION_GRANTED
+            if (hasScan && hasAdvertise) {
+                val program = collektiveProgram()
+                _connectionFlow.value = ConnectionState.CONNECTED
+                Log.i("NearbyDevicesViewModel", "Collektive program started")
+                while (true) {
+                    val newResult = program.cycle()
+                    _dataFlow.value = newResult
+                    delay(1.seconds)
+                    Log.i("NearbyDevicesViewModel", "New nearby devices: $newResult")
+                }
+            } else {
+                Log.e("NearbyDevicesViewModel", "Permissions not granted")
+                _connectionFlow.value = ConnectionState.DISCONNECTED
             }
         }
     }
