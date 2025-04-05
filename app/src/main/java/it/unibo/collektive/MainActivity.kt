@@ -89,7 +89,7 @@ private fun CollektiveNearbyDevices(modifier: Modifier = Modifier, viewModel: Ne
     }
     Column(modifier = modifier.then(Modifier.padding(20.dp)), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Collektive MQTT", modifier = Modifier.weight(1f), style = MaterialTheme.typography.displaySmall)
+            Text("Collektive MQTT + BT", modifier = Modifier.weight(1f), style = MaterialTheme.typography.displaySmall)
             Box(modifier = Modifier.size(24.dp).background(color = connectionColor, shape = CircleShape))
         }
         Text("ID: ${viewModel.deviceId}", style = MaterialTheme.typography.bodyLarge)
