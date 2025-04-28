@@ -33,7 +33,6 @@ ble = { module = "no.nordicsemi.android:ble", version = "2.10.0" }
 ble-ktx = { module = "no.nordicsemi.android:ble-ktx", version = "2.10.0" }
 collektive = { module = "it.unibo.collektive:collektive-dsl", version.ref = "collektive" }
 collektive-stdlib = { module = "it.unibo.collektive:collektive-stdlib", version.ref = "collektive" }
-collektive-plugin = { module = "it.unibo.collektive:collektive-compiler-plugin", version.ref = "collektive" }
 hivemq = { module = "com.hivemq:hivemq-mqtt-client", version.ref = "hivemq" }
 hivemq-reactor = { module = "com.hivemq:hivemq-mqtt-client-reactor", version.ref = "hivemq" }
 kotlin-logging-android = { module = "io.github.oshai:kotlin-logging-android", version.ref = "kotlin-logging" }
@@ -45,7 +44,7 @@ mktt = { module = "it.nicolasfarabegoli:mktt", version = "1.2.3" }
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 
 [bundles]
-collektive = [ "collektive", "collektive-stdlib", "collektive-plugin" ]
+collektive = [ "collektive", "collektive-stdlib" ]
 hivemq = ["hivemq", "hivemq-reactor"]
 serialization = [ "kotlinx-serialization-json", "kotlinx-serialization-protobuf" ]
 logging = [ "kotlin-logging-android", "slf4j" ]
