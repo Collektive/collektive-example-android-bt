@@ -39,7 +39,7 @@ kotlin-logging-android = { module = "io.github.oshai:kotlin-logging-android", ve
 kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.2"
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-mesh = { module = "no.nordicsemi.android:mesh", version = "3.3.4" }
+mesh = { module = "no.nordicsemi.android:mesh", version = "3.3.7" }
 mktt = { module = "it.nicolasfarabegoli:mktt", version = "1.2.3" }
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 
