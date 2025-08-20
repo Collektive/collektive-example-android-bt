@@ -14,26 +14,33 @@ tasks.withType<Detekt>().configureEach {
     exclude("**/ui/theme/**")
 }
 
+val javaVersion = 11
+val javaTarget = JavaVersion.entries.first { it.majorVersion == javaVersion.toString() }
+
+kotlin {
+    jvmToolchain(javaVersion)
+    compilerOptions {
+        allWarningsAsErrors = true
+        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+    }
+}
+
 android {
     namespace = "it.unibo.collektive"
     compileSdk = 35
-
     defaultConfig {
         applicationId = "it.unibo.collektive"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     packaging {
         resources.excludes += "META-INF/*.md"
         resources.excludes += "META-INF/INDEX.LIST"
         resources.excludes += "META-INF/io.netty.versions.properties"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -44,16 +51,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = "11"
-        compileOptions {
-            allWarningsAsErrors = true
-            freeCompilerArgs += listOf("-opt-in=kotlin.uuid.ExperimentalUuidApi")
-        }
+        sourceCompatibility = javaTarget
+        targetCompatibility = javaTarget
     }
     buildFeatures {
         compose = true
@@ -61,7 +60,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
