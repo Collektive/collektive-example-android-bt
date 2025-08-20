@@ -74,7 +74,6 @@ dependencies {
     implementation(libs.bundles.serialization)
     implementation(libs.bundles.hivemq)
     implementation(libs.bundles.logging)
-    implementation(libs.kotlinx.datetime)
     implementation(libs.mesh)
     implementation(libs.mktt)
     testImplementation(libs.junit)
