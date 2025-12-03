@@ -38,7 +38,7 @@ hivemq-reactor = { module = "com.hivemq:hivemq-mqtt-client-reactor", version.ref
 kotlin-logging-android = { module = "io.github.oshai:kotlin-logging-android", version.ref = "kotlin-logging" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
-mesh = { module = "no.nordicsemi.android:mesh", version = "3.3.9" }
+mesh = { module = "no.nordicsemi.android:mesh", version = "3.4.0" }
 mktt = { module = "it.nicolasfarabegoli:mktt", version = "1.2.3" }
 slf4j = "org.slf4j:slf4j-api:2.0.17"
 
