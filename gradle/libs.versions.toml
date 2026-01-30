@@ -9,7 +9,7 @@ junitVersion = "1.3.0"
 kotlin-logging = "7.0.14"
 espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.2"
+activityCompose = "1.12.3"
 composeBom = "2026.01.01"
 serialization = "1.10.0"
 
