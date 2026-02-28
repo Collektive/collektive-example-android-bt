@@ -10,7 +10,7 @@ kotlin-logging = "8.0.01"
 espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.4"
-composeBom = "2026.02.00"
+composeBom = "2026.02.01"
 serialization = "1.10.0"
 
 [libraries]
