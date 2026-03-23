@@ -10,6 +10,9 @@ import it.unibo.collektive.network.AbstractSerializerMailbox
 import it.unibo.collektive.network.bluetooth.BluetoothNeighborsDiscoverer
 import it.unibo.collektive.networking.Message
 import it.unibo.collektive.networking.SerializedMessage
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.uuid.Uuid
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -19,9 +22,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialFormat
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
-import kotlin.uuid.Uuid
 
 /**
  * A mailbox that uses MQTT as the underlying transport.

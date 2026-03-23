@@ -9,6 +9,10 @@ import it.unibo.collektive.networking.OutboundEnvelope
 import it.unibo.collektive.networking.SerializedMessage
 import it.unibo.collektive.networking.SerializedMessageFactory
 import it.unibo.collektive.path.Path
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.serialization.BinaryFormat
 import kotlinx.serialization.KSerializer
@@ -18,10 +22,6 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.encodeToString
-import kotlin.time.Clock
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * An abstract mailbox that serializes messages before sending them to the network.

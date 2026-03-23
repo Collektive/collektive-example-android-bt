@@ -15,11 +15,11 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import java.util.UUID
+import kotlin.uuid.Uuid
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.util.UUID
-import kotlin.uuid.Uuid
 
 /**
  * Discovers nearby Bluetooth devices by advertising its [deviceId] and scanning for others.
