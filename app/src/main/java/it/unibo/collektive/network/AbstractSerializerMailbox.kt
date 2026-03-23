@@ -46,7 +46,7 @@ abstract class AbstractSerializerMailbox<ID : Any>(
 
     private val messages = mutableMapOf<ID, TimedMessage<ID>>()
     private val neighbors = mutableSetOf<TimedHeartbeat<ID>>()
-    private val factory = object : SerializedMessageFactory<ID, Any?>(serializer) {}
+    private val factory = SerializedMessageFactory<ID, Any?>(serializer)
     private val neighborMessageFlow = MutableSharedFlow<Message<ID, Any?>>()
 
     /**
