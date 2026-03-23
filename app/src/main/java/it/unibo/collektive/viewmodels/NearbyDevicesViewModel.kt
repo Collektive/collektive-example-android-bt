@@ -9,7 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.collektive.Collektive
+import it.unibo.collektive.aggregate.api.mapNeighborhood
+import it.unibo.collektive.aggregate.api.neighborhood
 import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.aggregate.ids
 import it.unibo.collektive.network.mqtt.MqttMailbox
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +68,7 @@ class NearbyDevicesViewModel(application: Application) : AndroidViewModel(applic
         val mailbox =
             MqttMailbox(deviceId, "broker.hivemq.com", dispatcher = dispatcher, context = getApplication())
         return Collektive(deviceId, mailbox) {
-            neighboring(localId).neighbors.toSet()
+            neighborhood().neighbors.ids.set
         }
     }
 
