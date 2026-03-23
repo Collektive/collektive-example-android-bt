@@ -108,7 +108,7 @@ private fun CollektiveNearbyDevices(modifier: Modifier = Modifier, viewModel: Ne
 }
 
 @Preview(showBackground = true)
-@Suppress("UnusedPrivateMember")
+@Suppress("UnusedPrivateFunction")
 @Composable
 private fun DefaultPreview() {
     CollektiveExampleAndroidTheme {
