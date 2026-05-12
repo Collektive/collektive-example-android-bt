@@ -40,7 +40,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "serialization" }
 mesh = { module = "no.nordicsemi.android:mesh", version = "3.4.0" }
 mktt = { module = "it.nicolasfarabegoli:mktt", version = "1.2.3" }
-slf4j = "org.slf4j:slf4j-api:2.0.17"
+slf4j = "org.slf4j:slf4j-api:2.0.18"
 
 [bundles]
 collektive = [ "collektive", "collektive-stdlib" ]
