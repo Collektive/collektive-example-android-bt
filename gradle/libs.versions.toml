@@ -55,5 +55,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-qa = "org.danilopianini.gradle-kotlin-qa:1.8.1"
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-taskTree = "com.dorongold.task-tree:4.0.1"
+taskTree = "com.dorongold.task-tree:4.0.2"
 
