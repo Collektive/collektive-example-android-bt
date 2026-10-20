@@ -1,7 +1,7 @@
 [versions]
 agp = "9.4.1"
 kotlin = "2.4.21"
-collektive = "28.3.4"
+collektive = "28.3.5"
 coreKtx = "1.18.0"
 hivemq = "1.4.1"
 junit = "4.13.2"
